@@ -20,40 +20,79 @@
 # commettre
 # Bonus : réalisez l’interface graphique de ce jeu
 
+# On importe le module random pour gérer le nombre aléatoire de bâton
 import random
 
-number_of_stick = random.randint(15, 20)
-
-player_one = input("Quel est le nom du joueur 1?: ")
-player_two = input("Quel est le nom du joueur 2?: ")
-
-def get_stick(player, stick):
+# On crée une méthode pour afficher le nombre de bâton restant
+def draw_stick(remaining):
     
-    good_answer = False
-    
-    print(f"Vous disposez de {stick} bâtonnet(s).")
+    print(f"Bâtons restants : {'|' * remaining} ({remaining})")
 
-    while not good_answer:
-        try: 
-            number = int(input(f"Alors, {player}, combien de bâtonnet souhaitez vous retirer? (1, 2 ou 3): "))
+# On crée la méthode qui gère le choix du nombre de bâton que le joueur prend
+def take_stick(player, max_sticks):
 
-            if number != 1 or number != 2 or number != 3:
-                good_answer = True
-                return number
-            else:
-                print("Vous devez choisir entre 1 et 3 bâtonnets")
-        except:
-            print("Erreur: veuillez entrer une valeur valide") 
+    #  Boucle qui gère l'erreur de saisie
+    while True:
+        try:
+            choice = int(input(f"Joueur {player}, combien de bâtons voulez-vous enlever (1 à 3) ? "))
 
-is_playing = True
+            # On gère l'erreur dans le nombre de bâton choisi
+            if 1 <= choice <= 3 and choice <= max_sticks:
+                return choice
+            print(f"Choix invalide. Vous pouvez retirer entre 1 et {min(3, max_sticks)} bâtons.")
+        # On gère l'erreur de saisie si ce n'est pas un entier
+        except ValueError:
+            print("Entrée invalide. Veuillez entrer un nombre entier.")
 
-while is_playing:
+#  On crée la méthode qui gère le tour du joueur.
+def game_turn(player, stick_remaining):
 
-    if number_of_stick > 1:
-        choice_one = get_stick(player_one, number_of_stick)
-        number_of_stick -= choice_one
-        choice_two = get_stick(player_two, number_of_stick)
-        number_of_stick -= choice_two
-    else:
-        print(choice_one)
-        print(choice_two)
+    # On appelle la fonction pour afficher le nombre de bâton
+    draw_stick(stick_remaining)
+    # On appelle la fonction qui demande au joueur le nombre de bâton qu'il souhaite prendre
+    choice = take_stick(player, stick_remaining)
+
+    # On retourne le nombre de bâton restant
+    return stick_remaining - choice
+
+# On crée la fonction qui gère la partie
+def starting_player(starting_player):
+
+    #  On défini le nombre de bâton pour la partie
+    sticks_remaining = random.randint(15, 20)
+    player = starting_player
+
+    print("Nouvelle partie !")
+
+    # Boucle du jeu qui gère les tours et le joueur qui joue
+    while sticks_remaining > 0:
+        # On appelle la fonction qui gère le tour du joueur 1 ou 2
+        sticks_remaining = game_turn(player, sticks_remaining)
+
+        # S'il n'y a plus de bâton alors on retourne le joueur qui a pris le dernier bâton
+        if sticks_remaining == 0:
+            print(f"Joueur {player} a pris le dernier bâton. Joueur {3 - player} gagne !")
+            return player 
+        
+        # On alterne entre joueur 1 et 2 à chaque tour
+        player = 3 - player  
+
+# On crée la fonction qui gère la boucle des parties
+def sticks_game():
+
+    # Le joueur 2 commence la première partie
+    loser = 2  
+
+    # Boucle qui gère le lancement du jeu et la nouvelle partie
+    while True:
+        # Le perdant de la partie précédente commence si c'est une nième partie, sinon c'est le joueur 2
+        loser = starting_player(loser) 
+        # On demande s'il veut rejouer
+        replay = input("Voulez-vous rejouer ? (oui/non) : ").strip().lower()
+
+        if replay != 'oui':
+            print("Merci d'avoir joué !")
+            break
+
+# On Lance le jeu
+sticks_game()

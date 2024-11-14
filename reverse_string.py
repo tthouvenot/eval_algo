@@ -1,4 +1,5 @@
 # On doit créer une fonction qui inverse une chaîne de caractère et retourne la nouvelle chaîne
+
 def reversed_string(string):
 
     # On utilise la méthode du slicing en parcourant la chaîne en sens inverse
